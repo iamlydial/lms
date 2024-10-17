@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "NodeNext", // Ensures the module system is compatible with ES Modules
+    "moduleResolution": "NodeNext", // Required for proper module resolution with NodeNext
+    "esModuleInterop": true, // Ensures compatibility between CommonJS and ES Modules
+    "skipLibCheck": true, // Optionally skip type checking of declaration files
+    "strict": true, // Optionally enable strict mode for better type checking
+    "target": "ESNext", // Optional: Set the ECMAScript target version
+    "resolveJsonModule": true, // Optional: Allows importing JSON files as modules
+    "outDir": "./dist", // Optional: Output directory for compiled JS
+    "rootDir": "./" // Optional: Root directory of your TypeScript files
+  }
+}
