@@ -1,7 +1,10 @@
-import { NextFunction, Request } from "express";
+import { Request, Response, NextFunction } from "express";
 
 export const CatchAsyncError =
-  (theFunc: any) => (req: Request, res: Response, next: NextFunction) => {
+  (
+    theFunc: (req: Request, res: Response, next: NextFunction) => Promise<any>
+  ) =>
+  (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(theFunc(req, res, next)).catch(next);
   };
 
