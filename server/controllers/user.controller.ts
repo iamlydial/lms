@@ -126,3 +126,10 @@ export const activateUser = CatchAsyncError(
   }
 );
 
+//login user 
+interface ILoginRequest {
+  email: string; 
+  password: string; 
+}
+
+
