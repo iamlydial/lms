@@ -1,11 +1,10 @@
-
 import { NextFunction, Request, Response } from "express";
 import { CatchAsyncError } from "../middleware/catchAsyncErrors";
 import ErrorHandler from "../utils/ErrorHandler";
 import userModel, { IUser } from "../models/user.model";
 import jwt, { Secret } from "jsonwebtoken";
 import path from "path";
-import ejs from 'ejs'
+import ejs from "ejs";
 import sendMail from "../utils/sendMail";
 
 //register user
@@ -62,7 +61,6 @@ export const registrationUser = CatchAsyncError(
     }
   }
 );
-
 
 //activate user
 
@@ -126,10 +124,33 @@ export const activateUser = CatchAsyncError(
   }
 );
 
-//login user 
+//login user
 interface ILoginRequest {
-  email: string; 
-  password: string; 
+  email: string;
+  password: string;
 }
 
+export const loginUser = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email, password } = req.body as ILoginRequest;
+      if (!email || !password) {
+        return next(new ErrorHandler("Please enter email or password", 400));
+      }
 
+      const user = await userModel.findOne({ email }).select("+password");
+
+      if (!user) {
+        return next(new ErrorHandler("Invalid email or password", 400));
+      }
+
+      const isPasswordMatch = await user.comparePassword(password);
+
+      if (!isPasswordMatch) {
+        return next(new ErrorHandler("Invalid email or password", 400));
+      }
+    } catch (error: any) {
+      return next(new ErrorHandler("invalid request", 400));
+    }
+  }
+);
