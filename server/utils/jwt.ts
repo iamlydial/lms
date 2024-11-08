@@ -2,7 +2,6 @@ require("dotenv").config();
 import { Response } from "express";
 import { IUser } from "../models/user.model";
 import { redis } from "./redis";
-import { BooleanLiteral } from "typescript";
 
 interface ITokenOptions {
   expires: Date;
