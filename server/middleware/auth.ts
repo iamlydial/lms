@@ -30,7 +30,7 @@ export const isAuthenticated = CatchAsyncError(
     // 5. get the user from redis using the decoded token
     const user = await redis.get(decoded.id);
 
-    // 6. check if the user is there 
+    // 6. check if the user is there
     if (!user) {
       return next(new ErrorHandler("user not found", 400));
     }
@@ -38,6 +38,23 @@ export const isAuthenticated = CatchAsyncError(
     req.user = JSON.parse(user);
 
     // 8. Call next to pass control to the next middleware on the logout route handler
-    next()
+    next();
   }
 );
+
+//validate user role
+export const authorizedRoles = (...roles: string[]) => {
+  //returns another middleware function that receives req, res, and next
+  return (req: Request, res: Response, next: NextFunction) => {
+    //This middleware checks if the user's role is included in the roles array
+    if (!roles.includes(req.user?.role || "")) {
+      return next(
+        new ErrorHandler(
+          `Role: ${req.user?.role} is not allowed toaccess this resource`,
+          403
+        )
+      );
+    }
+    next()
+  };
+};
