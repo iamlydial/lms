@@ -269,3 +269,9 @@ export const socialAuth = CatchAsyncError(
     }
   }
 );
+
+//update user info
+interface IUpdateUserInfo {
+  name?: string;
+  email?: string;
+}
