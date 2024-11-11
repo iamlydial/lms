@@ -6,7 +6,11 @@ import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import path from "path";
 import ejs from "ejs";
 import sendMail from "../utils/sendMail";
-import { accessTokenOptions, refreshTokenOptions, sendToken } from "../utils/jwt";
+import {
+  accessTokenOptions,
+  refreshTokenOptions,
+  sendToken,
+} from "../utils/jwt";
 import { redis } from "../utils/redis";
 import { stat } from "fs";
 import { getUserById } from "../services/user.service";
@@ -216,25 +220,52 @@ export const updateAccessToken = CatchAsyncError(
           expiresIn: "5d",
         }
       );
-      res.cookie("access_token", accessToken, accessTokenOptions)
-      res.cookie("refresh_token", refreshToken, refreshTokenOptions)
+      res.cookie("access_token", accessToken, accessTokenOptions);
+      res.cookie("refresh_token", refreshToken, refreshTokenOptions);
 
       res.status(200).json({
-        status:"success",
-        accessToken
-      })
+        status: "success",
+        accessToken,
+      });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
 );
 
-//get user info 
-export const getUserInfo = CatchAsyncError(async(req: Request, res: Response, next: NextFunction)=>{
-  try {
-    const userId = req.user?._id as string;
-    getUserById(userId, res)
-  } catch (error: any) {
-    return next(new ErrorHandler(error.message, 400))
+//get user info
+export const getUserInfo = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user?._id as string;
+      getUserById(userId, res);
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
   }
-})
+);
+
+//defines the structure of the request body
+interface ISocialAuthBody {
+  email: string;
+  name: string;
+  avatar: string;
+}
+
+//social auth
+export const socialAuth = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email, name, avatar } = req.body as ISocialAuthBody;
+      const user = await userModel.findOne({ email });
+      if (!user) {
+        const newUser = await userModel.create({ email, name, avatar });
+        sendToken(newUser, 200, res);
+      } else {
+        sendToken(user, 200, res);
+      }
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
