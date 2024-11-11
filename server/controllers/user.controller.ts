@@ -9,6 +9,7 @@ import sendMail from "../utils/sendMail";
 import { accessTokenOptions, refreshTokenOptions, sendToken } from "../utils/jwt";
 import { redis } from "../utils/redis";
 import { stat } from "fs";
+import { getUserById } from "../services/user.service";
 
 //register user
 interface IRegistrationBody {
@@ -228,3 +229,12 @@ export const updateAccessToken = CatchAsyncError(
   }
 );
 
+//get user info 
+export const getUserInfo = CatchAsyncError(async(req: Request, res: Response, next: NextFunction)=>{
+  try {
+    const userId = req.user?._id as string;
+    getUserById(userId, res)
+  } catch (error: any) {
+    return next(new ErrorHandler(error.message, 400))
+  }
+})
