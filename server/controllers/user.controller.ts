@@ -339,7 +339,7 @@ export const updatePassword = CatchAsyncError(
 
       await user.save();
 
-      await redis.set(req.user?.id, JSON.stringify(user))
+      await redis.set(req.user?.id, JSON.stringify(user));
 
       res.status(201).json({
         success: true,
@@ -348,3 +348,9 @@ export const updatePassword = CatchAsyncError(
     } catch (error) {}
   }
 );
+
+//update profile picture
+interface IUpdateProfilePicture {
+  avatar: string;
+}
+
