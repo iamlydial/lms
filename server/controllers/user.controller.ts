@@ -321,6 +321,7 @@ export const updatePassword = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { oldPassword, newPassword } = req.body as IUpdatePassword;
+
       const user = await userModel.findById(req.user?._id).select("password");
 
       if (!oldPassword || !newPassword) {
@@ -357,10 +358,19 @@ interface IUpdateProfilePicture {
 export const updateProfilePicture = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { avatar } = req.body;
-
-      const userId = req?.body?._id as string;
+      const { avatar } = req.body as IUpdateProfilePicture;
+      console.log("req body", req.body);
+      const userId = await userModel.findById(req.user?._id) as string
+      
+      console.log("userId from update picture", userId);
       const user = await userModel.findById(userId);
+      console.log("user from update picture", user);
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
 
       if (avatar && user) {
         // if we have a user with avatar
@@ -395,6 +405,8 @@ export const updateProfilePicture = CatchAsyncError(
         success: true,
         user,
       });
-    } catch (error) {}
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
   }
 );

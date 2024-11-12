@@ -1,7 +1,7 @@
+require("dotenv").config();
 import { app } from "./app";
 import { v2 as cloudinary } from "cloudinary";
 import connectDB from "./utils/db";
-require("dotenv").config();
 
 //cloudinary config
 cloudinary.config({
