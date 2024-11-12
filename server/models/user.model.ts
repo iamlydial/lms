@@ -9,7 +9,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   avatar: {
-    pubic_id: string;
+    public_id: string;
     url: string;
   };
   role: string;

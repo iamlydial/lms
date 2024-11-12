@@ -12,8 +12,8 @@ import {
   sendToken,
 } from "../utils/jwt";
 import { redis } from "../utils/redis";
-import { stat } from "fs";
 import { getUserById } from "../services/user.service";
+import cloudinary from "cloudinary";
 
 //register user
 interface IRegistrationBody {
@@ -354,3 +354,47 @@ interface IUpdateProfilePicture {
   avatar: string;
 }
 
+export const updateProfilePicture = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { avatar } = req.body;
+
+      const userId = req?.body?._id as string;
+      const user = await userModel.findById(userId);
+
+      if (avatar && user) {
+        // if we have a user with avatar
+        if (user?.avatar?.public_id) {
+          //delete old image
+          await cloudinary.v2.uploader.destroy(user?.avatar?.public_id);
+          //set new avatar
+          const myCloud = await cloudinary.v2.uploader.upload(avatar, {
+            folder: "avatars",
+            width: 150,
+          });
+          user.avatar = {
+            public_id: myCloud.public_id,
+            url: myCloud.secure_url,
+          };
+        } else {
+          const myCloud = await cloudinary.v2.uploader.upload(avatar, {
+            folder: "avatars",
+            width: 150,
+          });
+          user.avatar = {
+            public_id: myCloud.public_id,
+            url: myCloud.secure_url,
+          };
+        }
+      }
+      await user?.save();
+
+      await redis.set(userId, JSON.stringify(user));
+
+      res.status(200).json({
+        success: true,
+        user,
+      });
+    } catch (error) {}
+  }
+);
