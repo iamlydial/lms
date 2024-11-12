@@ -321,7 +321,11 @@ export const updatePassword = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { oldPassword, newPassword } = req.body as IUpdatePassword;
-      const user = await userModel.findById(req.user?._id);
+      const user = await userModel.findById(req.user?._id).select("password");
+
+      if (!oldPassword || !newPassword) {
+        return next(new ErrorHandler("Please enter old and new password", 400));
+      }
 
       if (user?.password === undefined) {
         return next(new ErrorHandler("Invalid user", 400));
@@ -334,6 +338,8 @@ export const updatePassword = CatchAsyncError(
       user.password = newPassword;
 
       await user.save();
+
+      await redis.set(req.user?.id, JSON.stringify(user))
 
       res.status(201).json({
         success: true,
