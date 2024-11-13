@@ -50,3 +50,12 @@ interface ICourse extends Document {
   ratings?: number;
   purchased?: number;
 }
+
+const reviewSchema = new Schema<IReview>({
+    user: Object,
+    rating: {
+        type: Number,
+        default: 0
+    },
+    comment: String,
+})
