@@ -11,3 +11,21 @@ interface IReview extends Document {
   comment: string;
   commentReplies: IComment[];
 }
+
+interface ILink extends Document{
+    title: string; 
+    url: string;
+}
+
+interface ICouseData extends Document {
+    title: string;
+    description: string;
+    videoUrl: string; 
+    videoThumbnail: object;
+    videoSection: string;
+    videoLength: number;
+    videoPlayer: string;
+    links: ILink[];
+    suggestion: string;
+    questions: IComment[]; 
+}
