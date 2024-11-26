@@ -3,8 +3,10 @@ import { CatchAsyncError } from "../middleware/catchAsyncErrors";
 import ErrorHandler from "../utils/ErrorHandler";
 import cloudinary from "cloudinary";
 import { createCourse } from "../services/course.service";
-import CourseModel from "../models/course.model";
+import { CourseModel, CommentModel } from "../models/course.model";
 import { redis } from "../utils/redis";
+import mongoose from "mongoose";
+import { IUser } from "../models/user.model";
 
 //upload course
 export const uploadCourse = CatchAsyncError(
@@ -133,7 +135,7 @@ export const getCourseByUser = CatchAsyncError(
       const userCourseList = req.user?.courses;
       const courseId = req.params.id;
 
-      console.log("Course id: ", courseId)
+      console.log("Course id: ", courseId);
 
       const courseExist = userCourseList?.find(
         (course: any) => course._id.toString() === courseId
@@ -147,6 +149,49 @@ export const getCourseByUser = CatchAsyncError(
 
       const course = await CourseModel.findById(courseId);
 
+      res.status(200).json({
+        success: true,
+        course,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
+);
+
+//add question in course
+interface IAddQuestionData {
+  question: string;
+  courseId: string;
+  contentId: string;
+}
+
+export const addQuestion = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { question, courseId, contentId }: IAddQuestionData = req.body;
+      const course = await CourseModel.findById(courseId);
+      if (!mongoose.Types.ObjectId.isValid(contentId)) {
+        return next(new ErrorHandler("Invalid content id", 400));
+      }
+      const courseContent = course?.courseData.find((item: any) =>
+        item._id.equals(contentId)
+      );
+      if (!courseContent) {
+        return next(new ErrorHandler("invalid, content id.", 400));
+      }
+      //create question object
+      const newQuestion = new CommentModel({
+        user: req.user as IUser,
+        question,
+        questionReplies: [],
+      });
+
+      //add question to couse content
+      courseContent.questions.push(newQuestion);
+
+      //save
+      await course?.save();
       res.status(200).json({
         success: true,
         course,
