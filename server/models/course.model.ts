@@ -18,7 +18,7 @@ interface ILink extends Document {
   url: string;
 }
 
-interface ICouseData extends Document {
+interface ICourseData extends Document {
   title: string;
   description: string;
   videoUrl: string;
@@ -47,7 +47,7 @@ interface ICourse extends Document {
     title: string;
   }[];
   reviews: IReview[];
-  courseData: ICouseData[];
+  courseData: ICourseData[];
   ratings?: number;
   purchased?: number;
 }
@@ -72,7 +72,7 @@ const commentSchema = new Schema<IComment>({
   commentReplies: [Object],
 });
 
-const courseDataSchema = new Schema<ICouseData>({
+const courseDataSchema = new Schema<ICourseData>({
   videoUrl: String,
   videoThumbnail: Object,
   title: String,
