@@ -349,22 +349,26 @@ export const addreplyToReview = CatchAsyncError(
         (rev: any) => rev._id.toString() === reviewId
       );
 
-      if(!review){
+      if (!review) {
         return next(new ErrorHandler("Review not found", 500));
       }
 
       const replyData: any = {
-        user: req.user, 
-        comment
+        user: req.user,
+        comment,
+      };
+
+      if (!review.commentReplies) {
+        review.commentReplies = [];
       }
 
-      course.reviews.push(replyData)
-      await course?.save()
+      review.commentReplies?.push(replyData);
+
+      await course?.save();
       res.status(200).json({
         success: true,
         course,
       });
-
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));
     }
