@@ -275,3 +275,11 @@ export const addAnswer = CatchAsyncError(
     }
   }
 );
+
+// add review to course
+interface IAddReviewData {
+  review: string;
+  courseId: string;
+  rating: number;
+  userId: string;
+}
