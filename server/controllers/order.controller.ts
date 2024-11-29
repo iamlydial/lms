@@ -8,7 +8,6 @@ import ejs from "ejs";
 import sendMail from "../utils/sendMail";
 import NotificationModel from "../models/notification.model";
 import { newOrder } from "../services/order.service";
-import { send } from "process";
 import path from "path";
 
 //create order
