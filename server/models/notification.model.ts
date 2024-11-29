@@ -1,4 +1,3 @@
-import { timeStamp } from "console";
 import mongoose, { Document, Model, Schema } from "mongoose";
 
 export interface INotification extends Document {
